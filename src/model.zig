@@ -1,7 +1,7 @@
 const std = @import("std");
 const common = @import("common.zig");
 
-pub const Vec3 = common.Vector3;
+const Vec3 = common.Vector3;
 
 pub const ObjectData = struct {
     verts: std.ArrayList(Vec3) = .empty,
@@ -109,16 +109,25 @@ pub const Model = struct {
 
             fn lt(ctx: @This(), ia: usize, ib: usize) bool {
                 const az = @min(
-                    @min(ctx.verts[@intCast(ctx.faces[ia * 3 + 0] - 1)].z, ctx.verts[@intCast(ctx.faces[ia * 3 + 1] - 1)].z),
+                    @min(
+                        ctx.verts[@intCast(ctx.faces[ia * 3 + 0] - 1)].z,
+                        ctx.verts[@intCast(ctx.faces[ia * 3 + 1] - 1)].z,
+                    ),
                     ctx.verts[@intCast(ctx.faces[ia * 3 + 2] - 1)].z,
                 );
+
                 const bz = @min(
-                    @min(ctx.verts[@intCast(ctx.faces[ib * 3 + 0] - 1)].z, ctx.verts[@intCast(ctx.faces[ib * 3 + 1] - 1)].z),
+                    @min(
+                        ctx.verts[@intCast(ctx.faces[ib * 3 + 0] - 1)].z,
+                        ctx.verts[@intCast(ctx.faces[ib * 3 + 1] - 1)].z,
+                    ),
                     ctx.verts[@intCast(ctx.faces[ib * 3 + 2] - 1)].z,
                 );
+
                 return az < bz;
             }
         };
+
         std.mem.sort(usize, order, Ctx{ .faces = faces.items, .verts = verts.items }, Ctx.lt);
 
         var sorted = try self.alloc.alloc(i32, faces.items.len);

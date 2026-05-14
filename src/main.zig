@@ -25,18 +25,15 @@ pub fn main(init: std.process.Init) !void {
     const rng = prng.random();
 
     var framebuffer = try render.new(alloc, WIDTH, HEIGHT);
-    var zbuffer = try render.new(alloc, WIDTH, HEIGHT);
-
     defer framebuffer.deinit();
+
+    var zbuffer = try render.new(alloc, WIDTH, HEIGHT);
     defer zbuffer.deinit();
 
     var start = std.Io.Clock.now(.awake, io);
 
     var mm = try Model.new(alloc, io, "./diablo3_pose.obj");
     defer mm.deinit();
-
-    std.debug.print("filepath:  {s}\n", .{mm.filepath});
-    std.debug.print("&filepath: {}\n", .{&mm.filepath});
 
     const obj = try mm.load();
 

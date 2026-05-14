@@ -1,10 +1,10 @@
 const std = @import("std");
+const tga = @import("tgaimage.zig");
 
-pub const tga = @import("tgaimage.zig");
-
+// exports
 // pub const Vector3 = [3]f32;
 pub const Vector2 = [2]f32;
-pub const Vector3 = V3;
+pub const Vector3 = V3(f32);
 
 pub const WIDTH = 800;
 pub const HEIGHT = 800;
@@ -32,24 +32,48 @@ pub const Color = struct {
     }
 };
 
-pub const V3 = extern struct {
-    x: f32,
-    y: f32,
-    z: f32,
+fn V3(comptime T: type) type {
+    return extern struct {
+        x: T,
+        y: T,
+        z: T,
 
-    pub inline fn new(x: f32, y: f32, z: f32) V3 {
-        return .{ .x = x, .y = y, .z = z };
-    }
+        pub inline fn new(x: T, y: T, z: T) @This() {
+            return .{ .x = x, .y = y, .z = z };
+        }
 
-    pub inline fn v(self: V3) @Vector(3, f32) {
-        return .{ self.x, self.y, self.z };
-    }
+        pub inline fn v(self: V3) @Vector(3, T) {
+            return .{ self.x, self.y, self.z };
+        }
 
-    pub inline fn from(vec: @Vector(3, f32)) V3 {
-        return .{
-            .x = vec[0],
-            .y = vec[1],
-            .z = vec[2],
-        };
-    }
-};
+        pub inline fn from(vec: @Vector(3, f32)) @This() {
+            return .{
+                .x = vec[0],
+                .y = vec[1],
+                .z = vec[2],
+            };
+        }
+    };
+}
+
+// pub const V3 = extern struct {
+//     x: f32,
+//     y: f32,
+//     z: f32,
+//
+//     pub inline fn new(x: f32, y: f32, z: f32) V3 {
+//         return .{ .x = x, .y = y, .z = z };
+//     }
+//
+//     pub inline fn v(self: V3) @Vector(3, f32) {
+//         return .{ self.x, self.y, self.z };
+//     }
+//
+//     pub inline fn from(vec: @Vector(3, f32)) V3 {
+//         return .{
+//             .x = vec[0],
+//             .y = vec[1],
+//             .z = vec[2],
+//         };
+//     }
+// };
