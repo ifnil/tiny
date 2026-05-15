@@ -32,6 +32,10 @@ pub const Color = struct {
     }
 };
 
+const Mat3 = struct {
+    mat: [3]Vector3,
+};
+
 fn V3(comptime T: type) type {
     return extern struct {
         x: T,

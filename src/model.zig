@@ -98,44 +98,44 @@ pub const Model = struct {
         }
 
         // TODO: sort faces
-        const nf = faces.items.len / 3;
-        const order = try self.alloc.alloc(usize, nf);
-        defer self.alloc.free(order);
-        for (order, 0..) |*o, i| o.* = i;
-
-        const Ctx = struct {
-            faces: []const i32,
-            verts: []const Vec3,
-
-            fn lt(ctx: @This(), ia: usize, ib: usize) bool {
-                const az = @min(
-                    @min(
-                        ctx.verts[@intCast(ctx.faces[ia * 3 + 0] - 1)].z,
-                        ctx.verts[@intCast(ctx.faces[ia * 3 + 1] - 1)].z,
-                    ),
-                    ctx.verts[@intCast(ctx.faces[ia * 3 + 2] - 1)].z,
-                );
-
-                const bz = @min(
-                    @min(
-                        ctx.verts[@intCast(ctx.faces[ib * 3 + 0] - 1)].z,
-                        ctx.verts[@intCast(ctx.faces[ib * 3 + 1] - 1)].z,
-                    ),
-                    ctx.verts[@intCast(ctx.faces[ib * 3 + 2] - 1)].z,
-                );
-
-                return az < bz;
-            }
-        };
-
-        std.mem.sort(usize, order, Ctx{ .faces = faces.items, .verts = verts.items }, Ctx.lt);
-
-        var sorted = try self.alloc.alloc(i32, faces.items.len);
-        for (order, 0..) |src, dst| {
-            sorted[dst * 3 + 0] = faces.items[src * 3 + 0];
-            sorted[dst * 3 + 1] = faces.items[src * 3 + 1];
-            sorted[dst * 3 + 2] = faces.items[src * 3 + 2];
-        }
+        // const nf = faces.items.len / 3;
+        // const order = try self.alloc.alloc(usize, nf);
+        // defer self.alloc.free(order);
+        // for (order, 0..) |*o, i| o.* = i;
+        //
+        // const Ctx = struct {
+        //     faces: []const i32,
+        //     verts: []const Vec3,
+        //
+        //     fn lt(ctx: @This(), ia: usize, ib: usize) bool {
+        //         const az = @min(
+        //             @min(
+        //                 ctx.verts[@intCast(ctx.faces[ia * 3 + 0] - 1)].z,
+        //                 ctx.verts[@intCast(ctx.faces[ia * 3 + 1] - 1)].z,
+        //             ),
+        //             ctx.verts[@intCast(ctx.faces[ia * 3 + 2] - 1)].z,
+        //         );
+        //
+        //         const bz = @min(
+        //             @min(
+        //                 ctx.verts[@intCast(ctx.faces[ib * 3 + 0] - 1)].z,
+        //                 ctx.verts[@intCast(ctx.faces[ib * 3 + 1] - 1)].z,
+        //             ),
+        //             ctx.verts[@intCast(ctx.faces[ib * 3 + 2] - 1)].z,
+        //         );
+        //
+        //         return az < bz;
+        //     }
+        // };
+        //
+        // std.mem.sort(usize, order, Ctx{ .faces = faces.items, .verts = verts.items }, Ctx.lt);
+        //
+        // var sorted = try self.alloc.alloc(i32, faces.items.len);
+        // for (order, 0..) |src, dst| {
+        //     sorted[dst * 3 + 0] = faces.items[src * 3 + 0];
+        //     sorted[dst * 3 + 1] = faces.items[src * 3 + 1];
+        //     sorted[dst * 3 + 2] = faces.items[src * 3 + 2];
+        // }
 
         self.object.faces = try faces.clone(self.alloc);
         self.object.verts = try verts.clone(self.alloc);
