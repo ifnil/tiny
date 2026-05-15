@@ -20,6 +20,18 @@ pub const RenderContext = struct {
     zbuffer: *tga.TGAImage,
 };
 
+pub fn new(alloc: std.mem.Allocator, width: i32, height: i32) !tga.TGAImage {
+    return tga.TGAImage.init(alloc, width, height, @intFromEnum(tga.Format.rgb));
+}
+
+fn project(v: Vec3) Vec3 {
+    return Vec3.from(.{
+        (v.x + 1.0) * WIDTH / 2.0,
+        (v.y + 1.0) * HEIGHT / 2.0,
+        (v.z + 1.0) * 255.0 / 2.0,
+    });
+}
+
 pub fn renderFrame(ctx: RenderContext) !void {
     @memset(ctx.framebuffer.data, 0);
     @memset(ctx.zbuffer.data, 0);
@@ -64,16 +76,4 @@ pub fn renderFrame(ctx: RenderContext) !void {
             c,
         );
     }
-}
-
-pub fn new(alloc: std.mem.Allocator, width: i32, height: i32) !tga.TGAImage {
-    return tga.TGAImage.init(alloc, width, height, @intFromEnum(tga.Format.rgb));
-}
-
-fn project(v: Vec3) Vec3 {
-    return Vec3.from(.{
-        (v.x + 1.0) * WIDTH / 2.0,
-        (v.y + 1.0) * HEIGHT / 2.0,
-        (v.z + 1.0) * 255.0 / 2.0,
-    });
 }

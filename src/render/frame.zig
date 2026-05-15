@@ -1,7 +1,7 @@
 const std = @import("std");
 const tga = @import("../tgaimage.zig");
 
-//TODO: move tga and color to render/
+//WIP experiment
 const Color = @import("../common.zig").Color;
 
 pub const Frame = struct {

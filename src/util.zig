@@ -34,7 +34,7 @@ pub fn benchmark(
     const fps = 1000 / avg_ms;
 
     std.debug.print(
-        "{s} \x1b[35m[iter: {d}]:\n\x1b[31mbest=\x1b[0m{d:.3}ms \x1b[32mavg=\x1b[0m{d:.3}ms \x1b[35mfps=\x1b[0m{d:.3}\n",
+        "{s}: \x1b[35miter={d} \x1b[31mbest=\x1b[0m{d:.3}ms \x1b[32mavg=\x1b[0m{d:.3}ms \x1b[35mfps=\x1b[0m{d:.3}\n",
         .{
             name,
             iterations,

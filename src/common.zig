@@ -32,10 +32,6 @@ pub const Color = struct {
     }
 };
 
-const Mat3 = struct {
-    mat: [3]Vector3,
-};
-
 fn V3(comptime T: type) type {
     return extern struct {
         x: T,
@@ -59,25 +55,3 @@ fn V3(comptime T: type) type {
         }
     };
 }
-
-// pub const V3 = extern struct {
-//     x: f32,
-//     y: f32,
-//     z: f32,
-//
-//     pub inline fn new(x: f32, y: f32, z: f32) V3 {
-//         return .{ .x = x, .y = y, .z = z };
-//     }
-//
-//     pub inline fn v(self: V3) @Vector(3, f32) {
-//         return .{ self.x, self.y, self.z };
-//     }
-//
-//     pub inline fn from(vec: @Vector(3, f32)) V3 {
-//         return .{
-//             .x = vec[0],
-//             .y = vec[1],
-//             .z = vec[2],
-//         };
-//     }
-// };
