@@ -48,14 +48,7 @@ pub fn project(v: Vec3) Vec3 {
     });
 }
 
-pub fn line(
-    ax: i32,
-    ay: i32,
-    bx: i32,
-    by: i32,
-    framebuffer: *tga.TGAImage,
-    color: tga.TGAColor,
-) void {
+pub fn line(ax: i32, ay: i32, bx: i32, by: i32, framebuffer: *tga.TGAImage, color: tga.TGAColor) void {
     var x0 = ax;
     var y0 = ay;
     var x1 = bx;
@@ -89,14 +82,7 @@ pub fn line(
     }
 }
 
-pub fn signedTriangleArea(
-    ax: i32,
-    ay: i32,
-    bx: i32,
-    by: i32,
-    cx: i32,
-    cy: i32,
-) f32 {
+pub fn signedTriangleArea(ax: i32, ay: i32, bx: i32, by: i32, cx: i32, cy: i32) f32 {
     const a = (((by - ay) * (bx + ax)) + ((cy - by) * (cx + bx)) + ((ay - cy) * (ax + cx)));
     const b: f32 = @floatFromInt(a);
 
@@ -140,7 +126,6 @@ pub fn triangle(
             const fcz: f32 = @floatFromInt(cz);
 
             const fz: f32 = alpha * faz + beta * fbz + gamma * fcz;
-            // std.debug.print("fz: {d}  \t", .{fz});
             const iz: i16 = @intFromFloat(@min(fz, 255));
             const z: u8 = if (iz < 0) 0 else @intCast(iz);
 
@@ -149,7 +134,6 @@ pub fn triangle(
             if (z <= zbuffer.get(x, y).get(2))
                 continue;
 
-            // std.debug.print("z: {d}\n", .{z});
             zbuffer.set(x, y, Color.bgra(z, z, z, z));
             framebuffer.set(x, y, color);
         }
