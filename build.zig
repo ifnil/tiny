@@ -4,6 +4,13 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
+    const debug_logging = b.option(bool, "debug", "enable debug logging") orelse false;
+    const benchmark = b.option(bool, "bench", "enable benching") orelse false;
+
+    const options = b.addOptions();
+    options.addOption(bool, "debug_log", debug_logging);
+    options.addOption(bool, "bench", benchmark);
+
     const exe = b.addExecutable(.{
         .name = "tiny",
         .root_module = b.createModule(.{
@@ -14,13 +21,16 @@ pub fn build(b: *std.Build) void {
         }),
     });
 
+    exe.root_module.addOptions("build_options", options);
+
     b.installArtifact(exe);
+
     const run_step = b.step("run", "Run the app");
     const run_cmd = b.addRunArtifact(exe);
+
     run_step.dependOn(&run_cmd.step);
 
     run_cmd.step.dependOn(b.getInstallStep());
-
     if (b.args) |args| {
         run_cmd.addArgs(args);
     }
