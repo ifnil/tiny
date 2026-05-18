@@ -28,6 +28,7 @@ pub fn main(init: std.process.Init) !void {
     const alloc = gpa.allocator();
 
     var path: []const u8 = undefined;
+
     var args = init.minimal.args.iterate();
     defer args.deinit();
     _ = args.next();
