@@ -11,6 +11,11 @@ pub fn build(b: *std.Build) void {
     options.addOption(bool, "debug_log", debug_logging);
     options.addOption(bool, "bench", benchmark);
 
+    const regex = b.dependency("zig_regex", .{
+        .target = target,
+        .optimize = optimize,
+    });
+
     const exe = b.addExecutable(.{
         .name = "tiny",
         .root_module = b.createModule(.{
@@ -22,6 +27,8 @@ pub fn build(b: *std.Build) void {
     });
 
     exe.root_module.addOptions("build_options", options);
+
+    exe.root_module.addImport("regex", regex.module("regex"));
 
     b.installArtifact(exe);
 

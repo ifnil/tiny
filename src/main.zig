@@ -54,6 +54,8 @@ pub fn main(init: std.process.Init) !void {
             .framebuffer = &framebuffer,
             .zbuffer = &zbuffer,
             .rng = &rng,
+            .verticies = &mm.vertices,
+            .faces = &mm.face_vertices,
         }, render.renderFrame);
     } else {
         try render.renderFrame(.{
@@ -61,6 +63,8 @@ pub fn main(init: std.process.Init) !void {
             .framebuffer = &framebuffer,
             .zbuffer = &zbuffer,
             .rng = &rng,
+            .verticies = &mm.vertices,
+            .faces = &mm.face_vertices,
         });
 
         try framebuffer.writeTgaFile(io, "framebuffer.tga", true, true);

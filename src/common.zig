@@ -137,3 +137,13 @@ test "vec3" {
     const b = c.as(f32);
     std.debug.print("b: {}\n", .{b});
 }
+
+test "V3 create stress" {
+    const iterations: usize = 100000;
+    const start = std.Io.Clock.now(.awake, std.testing.io);
+    for (0..iterations) |i| {
+        _ = V3(usize).new(i, i + 1, i + 2);
+    }
+    const duration = start.durationTo(std.Io.Clock.now(.awake, std.testing.io)).toMicroseconds();
+    std.debug.print("took: {}us\n", .{duration});
+}
