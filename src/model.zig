@@ -1,11 +1,8 @@
 const std = @import("std");
 const common = @import("common.zig");
-const Regex = @import("regex").Regex;
 
-const Verts = @import("render/primitives/vector.zig").Verts;
-const VertsInt = @import("render/primitives/vector.zig").VertsInt;
-
-const Vec3 = common.Vector3;
+// const Vec3 = common.Vector3;
+const Vec3 = @Vector(3, f32);
 
 pub const ObjectData = struct {
     verts: std.ArrayList(Vec3) = .empty,
@@ -35,13 +32,6 @@ pub const Model = struct {
     io: std.Io,
     object: *ObjectData,
     filepath: []const u8,
-    vertices: Verts = undefined,
-    face_vertices: Verts = undefined,
-
-    pub const Counts = struct {
-        vertices: i32 = 0,
-        faces: i32 = 0,
-    };
 
     pub fn new(alloc: std.mem.Allocator, io: std.Io, path: []const u8) !Model {
         return .{
@@ -57,31 +47,6 @@ pub const Model = struct {
         self.object.verts.deinit(self.alloc);
     }
 
-    fn getCounts(file_data: []const u8) !Counts {
-        var count = Counts{};
-        var iter = std.mem.splitScalar(u8, file_data, '\n');
-        while (iter.next()) |line| {
-            if (std.mem.containsAtLeast(u8, line, 1, "#")) {
-                var tok = std.mem.splitScalar(u8, line, ' ');
-                _ = tok.next();
-
-                const c = tok.next() orelse continue;
-                const k = tok.next() orelse continue;
-
-                if (std.mem.eql(u8, k, "vertices")) {
-                    count.vertices = try std.fmt.parseInt(i32, c, 10);
-                }
-
-                if (std.mem.eql(u8, k, "faces")) {
-                    count.faces = try std.fmt.parseInt(i32, c, 10);
-                }
-            }
-        }
-
-        return count;
-    }
-
-    // TODO: improve
     pub fn load(self: *Model) !*ObjectData {
         const file_data = try std.Io.Dir.cwd().readFileAlloc(
             self.io,
@@ -91,31 +56,12 @@ pub const Model = struct {
         );
         errdefer self.alloc.free(file_data);
 
-        var fv: std.AutoHashMap(i32, [3]f32) = .init(self.alloc);
-        const counts = try getCounts(file_data);
-        std.debug.print("verts: {d}\n", .{counts.vertices});
-        std.debug.print("faces: {d}\n", .{counts.faces});
-
-        var face_vertices = Verts{
-            .x = try self.alloc.alloc(f32, @intCast(counts.faces)),
-            .y = try self.alloc.alloc(f32, @intCast(counts.faces)),
-            .z = try self.alloc.alloc(f32, @intCast(counts.faces)),
-        };
-
-        var vertices = Verts{
-            .x = try self.alloc.alloc(f32, @intCast(counts.vertices)),
-            .y = try self.alloc.alloc(f32, @intCast(counts.vertices)),
-            .z = try self.alloc.alloc(f32, @intCast(counts.vertices)),
-        };
-
         var verts: std.ArrayList(Vec3) = .empty;
-        var faces: std.ArrayList(i32) = .empty;
-
         defer verts.deinit(self.alloc);
+
+        var faces: std.ArrayList(i32) = .empty;
         defer faces.deinit(self.alloc);
 
-        var vert_idx: usize = 0;
-        var face_idx: usize = 0;
         var iter = std.mem.splitScalar(u8, file_data, '\n');
         while (iter.next()) |line| {
             var words_iter = std.mem.splitScalar(u8, line, ' ');
@@ -129,15 +75,8 @@ pub const Model = struct {
                 const vx = try std.fmt.parseFloat(f32, x);
                 const vy = try std.fmt.parseFloat(f32, y);
                 const vz = try std.fmt.parseFloat(f32, z);
-                try verts.append(self.alloc, Vec3.from(.{ vx, vy, vz }));
 
-                // TODO: handle
-                if (vert_idx >= counts.vertices)
-                    continue;
-                vertices.x[vert_idx] = vx;
-                vertices.y[vert_idx] = vy;
-                vertices.z[vert_idx] = vz;
-                vert_idx += 1;
+                try verts.append(self.alloc, .{ vx, vy, vz });
             } else if (std.mem.eql(u8, line_type, "f")) {
                 var face_iter = std.mem.splitScalar(u8, x, '/');
                 const fx = face_iter.next() orelse continue;
@@ -155,34 +94,12 @@ pub const Model = struct {
                 try faces.append(self.alloc, dx);
                 try faces.append(self.alloc, dy);
                 try faces.append(self.alloc, dz);
-
-                face_vertices.x[face_idx] = @floatFromInt(dx);
-                face_vertices.y[face_idx] = @floatFromInt(dy);
-                face_vertices.z[face_idx] = @floatFromInt(dz);
-                face_idx += 1;
             }
         }
 
         self.object.faces = try faces.clone(self.alloc);
         self.object.verts = try verts.clone(self.alloc);
-        self.vertices = vertices;
-        self.face_vertices = face_vertices;
 
-        for (self.face_vertices.x) |v| {
-            try fv.put(@intFromFloat(v), .{
-                self.vertices.x[@intFromFloat(v - 1)],
-                self.vertices.y[@intFromFloat(v - 1)],
-                self.vertices.z[@intFromFloat(v - 1)],
-            });
-        }
-
-        std.debug.print("x: {d}\n", .{self.vertices.x.len});
-        std.debug.print("y: {d}\n", .{self.vertices.y.len});
-        std.debug.print("z: {d}\n", .{self.vertices.z.len});
-
-        std.debug.print("x: {d}\n", .{face_vertices.x.len});
-        std.debug.print("y: {d}\n", .{face_vertices.y.len});
-        std.debug.print("z: {d}\n", .{face_vertices.z.len});
         return self.object;
     }
 };

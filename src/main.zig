@@ -1,16 +1,13 @@
 const build_options = @import("build_options");
-
 const std = @import("std");
 const tga = @import("tgaimage.zig");
 const common = @import("common.zig");
-const render = @import("render.zig");
+const render = @import("render/render.zig");
 const util = @import("util.zig");
 
 const Model = @import("model.zig").Model;
 const ObjectData = @import("model.zig").ObjectData;
 
-const Vec2 = common.Vector2;
-const Vec3 = common.Vector3;
 const Color = common.Color;
 
 const WIDTH = common.WIDTH;
@@ -54,8 +51,6 @@ pub fn main(init: std.process.Init) !void {
             .framebuffer = &framebuffer,
             .zbuffer = &zbuffer,
             .rng = &rng,
-            .verticies = &mm.vertices,
-            .faces = &mm.face_vertices,
         }, render.renderFrame);
     } else {
         try render.renderFrame(.{
@@ -63,8 +58,6 @@ pub fn main(init: std.process.Init) !void {
             .framebuffer = &framebuffer,
             .zbuffer = &zbuffer,
             .rng = &rng,
-            .verticies = &mm.vertices,
-            .faces = &mm.face_vertices,
         });
 
         try framebuffer.writeTgaFile(io, "framebuffer.tga", true, true);
