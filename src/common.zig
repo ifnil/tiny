@@ -51,6 +51,7 @@ fn V3(comptime T: type) type {
 
         pub inline fn as(self: Self, comptime P: type) V3(P) {
             std.debug.print("typeof P: {}\n", .{@TypeOf(P)});
+
             if (P == comptime_int) {
                 const x = @as(P, @intCast(self.x));
                 const y = @as(P, @intCast(self.y));
@@ -124,7 +125,7 @@ fn V3(comptime T: type) type {
 test "vec3" {
     var tv = V3(i32).new(1, 1, 1);
 
-    const x = tv.toVec();
+    const x: @Vector(3, i32) = tv.toVec();
     std.debug.print("x: {}\n", .{x});
     std.debug.print("x: {}\n", .{x[1]});
 
@@ -136,6 +137,8 @@ test "vec3" {
 
     const b = c.as(f32);
     std.debug.print("b: {}\n", .{b});
+    std.debug.print("sizeof: {d}\n", .{@sizeOf(V3(f32))});
+    std.debug.print("sizeof: {d}\n", .{@sizeOf(@Vector(4, f32))});
 }
 
 test "V3 create stress" {

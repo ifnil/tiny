@@ -89,12 +89,9 @@ pub const Model = struct {
             self.alloc,
             .unlimited,
         );
-
-        // hm
         errdefer self.alloc.free(file_data);
 
         var fv: std.AutoHashMap(i32, [3]f32) = .init(self.alloc);
-
         const counts = try getCounts(file_data);
         std.debug.print("verts: {d}\n", .{counts.vertices});
         std.debug.print("faces: {d}\n", .{counts.faces});
@@ -173,9 +170,9 @@ pub const Model = struct {
 
         for (self.face_vertices.x) |v| {
             try fv.put(@intFromFloat(v), .{
-                self.vertices.x[@intFromFloat(v)],
-                self.vertices.y[@intFromFloat(v)],
-                self.vertices.z[@intFromFloat(v)],
+                self.vertices.x[@intFromFloat(v - 1)],
+                self.vertices.y[@intFromFloat(v - 1)],
+                self.vertices.z[@intFromFloat(v - 1)],
             });
         }
 

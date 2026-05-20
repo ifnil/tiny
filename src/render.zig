@@ -55,31 +55,31 @@ pub fn renderFrame(ctx: RenderContext) !void {
         const pb = project(ctx.obj.vert(@intCast(i), 1));
         const pc = project(ctx.obj.vert(@intCast(i), 2));
 
-        std.debug.print("\ni: {d}\n", .{i});
-        const tpax = ctx.verticies.x[@intCast(ctx.faces.x[i] - 1)];
-        const tpay = ctx.verticies.y[@intCast(ctx.faces.x[i] - 1)];
-        const tpaz = ctx.verticies.z[@intCast(ctx.faces.x[i] - 1)];
-        const x, const y, const z = project_point(tpax, tpay, tpaz);
-        std.debug.print("tpa:\t{d}\t{d}\t{d}\n", .{ tpax, tpay, tpaz });
-        std.debug.print("xyz:\t{d}\t{d}\t{d}\n", .{ x, y, z });
-        std.debug.print("pa:\t{d}\t{d}\t{d}\n", .{ pa.x, pa.y, pa.z });
-
-        const tpbx = ctx.verticies.x[@intCast(ctx.faces.y[i] - 1)];
-        const tpby = ctx.verticies.y[@intCast(ctx.faces.y[i] - 1)];
-        const tpbz = ctx.verticies.z[@intCast(ctx.faces.y[i] - 1)];
-        const tbx, const tby, const tbz = project_point(tpbx, tpby, tpbz);
-        std.debug.print("\ntpb:\t{d}\t{d}\t{d}\n", .{ tpbx, tpby, tpbz });
-        std.debug.print("xyz:\t{d}\t{d}\t{d}\n", .{ tbx, tby, tbz });
-        std.debug.print("pb:\t{d}\t{d}\t{d}\n", .{ pb.x, pb.y, pb.z });
-
-        const tpcx = ctx.verticies.x[@intCast(ctx.faces.z[i] - 1)];
-        const tpcy = ctx.verticies.y[@intCast(ctx.faces.z[i] - 1)];
-        const tpcz = ctx.verticies.z[@intCast(ctx.faces.z[i] - 1)];
-        const tcx, const tcy, const tcz = project_point(tpcx, tpcy, tpcz);
-        std.debug.print("\ntpc:\t{d}\t{d}\t{d}\n", .{ tpcx, tpcy, tpcz });
-        std.debug.print("xyz:\t{d}\t{d}\t{d}\n", .{ tcx, tcy, tcz });
-        std.debug.print("pc:\t{d}\t{d}\t{d}\n", .{ pc.x, pc.y, pc.z });
-
+        // std.debug.print("\ni: {d}\n", .{i});
+        // const tpax = ctx.verticies.x[@intFromFloat(ctx.faces.x[i] - 1)];
+        // const tpay = ctx.verticies.y[@intFromFloat(ctx.faces.x[i] - 1)];
+        // const tpaz = ctx.verticies.z[@intFromFloat(ctx.faces.x[i] - 1)];
+        // const x, const y, const z = project_point(tpax, tpay, tpaz);
+        // std.debug.print("tpa:\t{d}\t{d}\t{d}\n", .{ tpax, tpay, tpaz });
+        // std.debug.print("xyz:\t{d}\t{d}\t{d}\n", .{ x, y, z });
+        // std.debug.print("pa:\t{d}\t{d}\t{d}\n", .{ pa.x, pa.y, pa.z });
+        //
+        // const tpbx = ctx.verticies.x[@intFromFloat(ctx.faces.y[i] - 1)];
+        // const tpby = ctx.verticies.y[@intFromFloat(ctx.faces.y[i] - 1)];
+        // const tpbz = ctx.verticies.z[@intFromFloat(ctx.faces.y[i] - 1)];
+        // const tbx, const tby, const tbz = project_point(tpbx, tpby, tpbz);
+        // std.debug.print("\ntpb:\t{d}\t{d}\t{d}\n", .{ tpbx, tpby, tpbz });
+        // std.debug.print("xyz:\t{d}\t{d}\t{d}\n", .{ tbx, tby, tbz });
+        // std.debug.print("pb:\t{d}\t{d}\t{d}\n", .{ pb.x, pb.y, pb.z });
+        //
+        // const tpcx = ctx.verticies.x[@intFromFloat(ctx.faces.z[i] - 1)];
+        // const tpcy = ctx.verticies.y[@intFromFloat(ctx.faces.z[i] - 1)];
+        // const tpcz = ctx.verticies.z[@intFromFloat(ctx.faces.z[i] - 1)];
+        // const tcx, const tcy, const tcz = project_point(tpcx, tpcy, tpcz);
+        // std.debug.print("\ntpc:\t{d}\t{d}\t{d}\n", .{ tpcx, tpcy, tpcz });
+        // std.debug.print("xyz:\t{d}\t{d}\t{d}\n", .{ tcx, tcy, tcz });
+        // std.debug.print("pc:\t{d}\t{d}\t{d}\n", .{ pc.x, pc.y, pc.z });
+        //
         const ax: i32 = @intFromFloat(@floor(pa.x));
         const ay: i32 = @intFromFloat(@floor(pa.y));
         const az: i32 = @intFromFloat(@floor(pa.z));
