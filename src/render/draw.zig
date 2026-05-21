@@ -42,6 +42,74 @@ fn signedTriangleArea(ax: i32, ay: i32, bx: i32, by: i32, cx: i32, cy: i32) f32 
     return b;
 }
 
+fn signedTriangleAreaF(
+    a: @Vector(3, f32),
+    b: @Vector(3, f32),
+    c: @Vector(3, f32),
+) f32 {
+    return (((b[1] - a[1]) * (b[0] + a[0])) + ((c[1] - b[1]) * (c[0] + b[0])) + ((a[1] - c[1]) * (a[0] + c[0])));
+}
+
+pub fn trianglev(
+    a: @Vector(3, f32),
+    b: @Vector(3, f32),
+    c: @Vector(3, f32),
+    zbuffer: *tga.TGAImage,
+    framebuffer: *tga.TGAImage,
+    color: tga.TGAColor,
+) void {
+    const bbminx: i32 = @intFromFloat(@min(@min(a[0], b[0]), c[0]));
+    const bbminy: i32 = @intFromFloat(@min(@min(a[1], b[1]), c[1]));
+
+    const bbmaxx: i32 = @intFromFloat(@max(@max(a[0], b[0]), c[0]));
+    const bbmaxy: i32 = @intFromFloat(@max(@max(a[1], b[1]), c[1]));
+
+    const total_area = signedTriangleAreaF(a, b, c);
+
+    if (total_area < 1)
+        return;
+
+    var x = bbminx;
+    while (x <= bbmaxx) : (x += 1) {
+        var y = bbminy;
+        while (y <= bbmaxy) : (y += 1) {
+            const v: @Vector(3, f32) = .{
+                @floatFromInt(x),
+                @floatFromInt(y),
+                0.0,
+            };
+
+            const alpha = signedTriangleAreaF(v, b, c) / total_area;
+            const beta = signedTriangleAreaF(v, c, a) / total_area;
+            const gamma = signedTriangleAreaF(v, a, b) / total_area;
+
+            std.debug.print("\n", .{});
+            std.debug.print("x:     {}\n", .{x});
+            std.debug.print("y:     {}\n", .{y});
+
+            std.debug.print("alpha: {}\n", .{alpha});
+            std.debug.print("beta:  {}\n", .{beta});
+            std.debug.print("gamma: {}\n", .{gamma});
+
+            const fz: f32 = alpha * a[2] + beta * b[2] + gamma * c[2];
+            const iz: i32 = @intFromFloat(@min((fz), 255));
+            const z: u8 = if (iz < 0) 0 else @intCast(iz);
+
+            std.debug.print("fz:    {}\n", .{fz});
+            std.debug.print("iz:    {}\n", .{iz});
+            std.debug.print("z:     {}\n", .{z});
+
+            if (alpha < 0 or beta < 0 or gamma < 0)
+                continue;
+            if (z <= zbuffer.get(x, y).get(2))
+                continue;
+
+            zbuffer.set(x, y, Color.bgra(z, z, z, z));
+            framebuffer.set(x, y, color);
+        }
+    }
+}
+
 pub fn triangle(
     ax: i32,
     ay: i32,
@@ -74,6 +142,14 @@ pub fn triangle(
             const beta = signedTriangleArea(x, y, cx, cy, ax, ay) / total_area;
             const gamma = signedTriangleArea(x, y, ax, ay, bx, by) / total_area;
 
+            std.debug.print("\n", .{});
+            std.debug.print("x: {}\n", .{x});
+            std.debug.print("y: {}\n", .{y});
+
+            std.debug.print("alpha: {}\n", .{alpha});
+            std.debug.print("beta: {}\n", .{beta});
+            std.debug.print("gamma: {}\n", .{gamma});
+
             const faz: f32 = @floatFromInt(az);
             const fbz: f32 = @floatFromInt(bz);
             const fcz: f32 = @floatFromInt(cz);
@@ -81,6 +157,10 @@ pub fn triangle(
             const fz: f32 = alpha * faz + beta * fbz + gamma * fcz;
             const iz: i16 = @intFromFloat(@min(fz, 255));
             const z: u8 = if (iz < 0) 0 else @intCast(iz);
+
+            std.debug.print("fz: {}\n", .{fz});
+            std.debug.print("iz: {}\n", .{iz});
+            std.debug.print("z: {}\n", .{z});
 
             if (alpha < 0 or beta < 0 or gamma < 0)
                 continue;
