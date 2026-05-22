@@ -2,6 +2,10 @@ const std = @import("std");
 const tga = @import("../tgaimage.zig");
 const Color = @import("../common.zig").Color;
 
+pub const Triangle = struct {
+    face: [3][3]@Vector(3, f32),
+};
+
 pub fn line(ax: i32, ay: i32, bx: i32, by: i32, framebuffer: *tga.TGAImage, color: tga.TGAColor) void {
     var x0 = ax;
     var y0 = ay;
@@ -58,11 +62,11 @@ pub fn trianglev(
     framebuffer: *tga.TGAImage,
     color: tga.TGAColor,
 ) void {
-    const bbminx: i32 = @intFromFloat(@min(@min(a[0], b[0]), c[0]));
-    const bbminy: i32 = @intFromFloat(@min(@min(a[1], b[1]), c[1]));
+    const bbminx: i32 = @intFromFloat(@floor(@min(@min(a[0], b[0]), c[0])));
+    const bbminy: i32 = @intFromFloat(@floor(@min(@min(a[1], b[1]), c[1])));
 
-    const bbmaxx: i32 = @intFromFloat(@max(@max(a[0], b[0]), c[0]));
-    const bbmaxy: i32 = @intFromFloat(@max(@max(a[1], b[1]), c[1]));
+    const bbmaxx: i32 = @intFromFloat(@ceil(@max(@max(a[0], b[0]), c[0])));
+    const bbmaxy: i32 = @intFromFloat(@ceil(@max(@max(a[1], b[1]), c[1])));
 
     const total_area = signedTriangleAreaF(a, b, c);
 
@@ -74,8 +78,8 @@ pub fn trianglev(
         var y = bbminy;
         while (y <= bbmaxy) : (y += 1) {
             const v: @Vector(3, f32) = .{
-                @floatFromInt(x),
-                @floatFromInt(y),
+                @as(f32, @floatFromInt(x)) + 0.5,
+                @as(f32, @floatFromInt(y)) + 0.5,
                 0.0,
             };
 
@@ -83,21 +87,9 @@ pub fn trianglev(
             const beta = signedTriangleAreaF(v, c, a) / total_area;
             const gamma = signedTriangleAreaF(v, a, b) / total_area;
 
-            std.debug.print("\n", .{});
-            std.debug.print("x:     {}\n", .{x});
-            std.debug.print("y:     {}\n", .{y});
-
-            std.debug.print("alpha: {}\n", .{alpha});
-            std.debug.print("beta:  {}\n", .{beta});
-            std.debug.print("gamma: {}\n", .{gamma});
-
             const fz: f32 = alpha * a[2] + beta * b[2] + gamma * c[2];
             const iz: i32 = @intFromFloat(@min((fz), 255));
             const z: u8 = if (iz < 0) 0 else @intCast(iz);
-
-            std.debug.print("fz:    {}\n", .{fz});
-            std.debug.print("iz:    {}\n", .{iz});
-            std.debug.print("z:     {}\n", .{z});
 
             if (alpha < 0 or beta < 0 or gamma < 0)
                 continue;
