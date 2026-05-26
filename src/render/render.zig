@@ -7,13 +7,11 @@ const draw = @import("draw.zig");
 const WIDTH = common.WIDTH;
 const HEIGHT = common.HEIGHT;
 
-// const Vec3 = common.Vector3;
+const Vec3 = common.Vec3;
 const Mat4 = common.Mat4;
 const Color = common.Color;
 const Model = model.Model;
 const ObjectData = model.ObjectData;
-
-const Vec3 = @Vector(3, f32);
 
 pub const RenderContext = extern struct {
     obj: *const ObjectData,
@@ -27,6 +25,7 @@ fn project(v: Vec3) Vec3 {
         (v[0] + 1.0) * WIDTH / 2.0,
         (v[1] + 1.0) * HEIGHT / 2.0,
         (v[2] + 1.0) * 255.0 / 2.0,
+        1.0,
     };
 }
 
@@ -37,7 +36,17 @@ fn persp(v: Vec3) Vec3 {
     const vy = v[1] / (1.0 - v[2] / c);
     const vz = v[2] / (1.0 - v[2] / c);
 
-    return .{ vx, vy, vz };
+    return .{ vx, vy, vz, 1 };
+}
+
+fn perspective(f: f32) Mat4 {
+    const p = -1 / f;
+    return .{
+        .{ 1, 0, 0, 0 },
+        .{ 0, 1, 0, 0 },
+        .{ 0, 0, 1, 0 },
+        .{ 0, 0, p, 1 },
+    };
 }
 
 fn rotate(v: Vec3) Vec3 {
@@ -55,7 +64,7 @@ fn rotate(v: Vec3) Vec3 {
     const my = v[0] * rot[1][0] + v[1] * rot[1][1] + v[2] * rot[1][2];
     const mz = v[0] * rot[2][0] + v[1] * rot[2][1] + v[2] * rot[2][2];
 
-    return .{ mx, my, mz };
+    return .{ mx, my, mz, 1 };
 }
 
 fn apply(ctx: RenderContext, f: usize, n: usize) Vec3 {
@@ -67,7 +76,6 @@ pub fn new(alloc: std.mem.Allocator, width: i32, height: i32) !tga.TGAImage {
     return tga.TGAImage.init(alloc, width, height, @intFromEnum(tga.Format.rgb));
 }
 
-// TODO: reduce casting
 pub fn renderFrame(ctx: RenderContext) !void {
     @memset(ctx.framebuffer.data, 0);
     @memset(ctx.zbuffer.data, 0);
@@ -85,33 +93,6 @@ pub fn renderFrame(ctx: RenderContext) !void {
         const pb = apply(ctx, i, 1);
         const pc = apply(ctx, i, 2);
 
-        draw.trianglev(pa, pb, pc, ctx.zbuffer, ctx.framebuffer, c);
-
-        // const ax: i32 = @intFromFloat(@floor(pa[0]));
-        // const ay: i32 = @intFromFloat(@floor(pa[1]));
-        // const az: i32 = @intFromFloat(@floor(pa[2]));
-        //
-        // const bx: i32 = @intFromFloat(@floor(pb[0]));
-        // const by: i32 = @intFromFloat(@floor(pb[1]));
-        // const bz: i32 = @intFromFloat(@floor(pb[2]));
-        //
-        // const cx: i32 = @intFromFloat(@floor(pc[0]));
-        // const cy: i32 = @intFromFloat(@floor(pc[1]));
-        // const cz: i32 = @intFromFloat(@floor(pc[2]));
-        //
-        // draw.triangle(
-        //     ax,
-        //     ay,
-        //     az,
-        //     bx,
-        //     by,
-        //     bz,
-        //     cx,
-        //     cy,
-        //     cz,
-        //     ctx.zbuffer,
-        //     ctx.framebuffer,
-        //     c,
-        // );
+        draw.triangle(pa, pb, pc, ctx.zbuffer, ctx.framebuffer, c);
     }
 }

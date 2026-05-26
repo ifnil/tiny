@@ -5,8 +5,8 @@ const tga = @import("tgaimage.zig");
 pub const WIDTH = 800;
 pub const HEIGHT = 800;
 
-pub const Vector3 = Vec3Simd;
-pub const Mat4 = Matrix4x4;
+pub const Vec3 = @Vector(4, f32);
+pub const Mat4 = @Vector(4, f32);
 
 pub const Color = struct {
     pub const white: tga.TGAColor = .{ .bgra = .{ 255, 255, 255, 255 }, .bytespp = 4 };
@@ -17,17 +17,6 @@ pub const Color = struct {
 
     pub fn bgra(b: u8, g: u8, r: u8, a: u8) tga.TGAColor {
         return .{ .bgra = .{ b, g, r, a }, .bytespp = 4 };
-    }
-
-    pub fn rgba(r: u8, g: u8, b: u8, a: u8) tga.TGAColor {
-        return .{ .bgra = .{ b, g, r, a }, .bytespp = 4 };
-    }
-
-    pub fn rgb(r: u8, g: u8, b: u8) tga.TGAColor {
-        return .{
-            .bgra = .{ b, g, r, std.math.maxInt(u8) },
-            .bytespp = 4,
-        };
     }
 };
 
@@ -52,13 +41,6 @@ pub const Matrix4x4 = struct {
         const z: V = @splat(v[2]);
         const w: V = @splat(v[3]);
 
-        // const mx = x.mult(m.cols[0]);
-        // const my = y.mult(m.cols[1]);
-        // const mz = z.mult(m.cols[2]);
-        // const mw = w.mult(m.cols[3]);
-        //
-        // return mx.add(my.add(my.add(mz.add(mw))));
-        //
         return m.cols[0] * x + m.cols[1] * y + m.cols[2] * z + m.cols[3] * w;
     }
 
@@ -87,7 +69,7 @@ pub const Matrix4x4 = struct {
         };
     }
 
-    pub fn rotationAxis(axis: Vector3, angle: f32) Matrix4x4 {
+    pub fn rotationAxis(axis: Vec3, angle: f32) Matrix4x4 {
         const a = axis.normalize();
         const x = a.x();
         const y = a.y();

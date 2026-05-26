@@ -1,8 +1,7 @@
 const std = @import("std");
 const common = @import("common.zig");
 
-// const Vec3 = common.Vector3;
-const Vec3 = @Vector(3, f32);
+const Vec3 = common.Vec3;
 
 pub const ObjectData = struct {
     verts: std.ArrayList(Vec3) = .empty,
@@ -76,7 +75,7 @@ pub const Model = struct {
                 const vy = try std.fmt.parseFloat(f32, y);
                 const vz = try std.fmt.parseFloat(f32, z);
 
-                try verts.append(self.alloc, .{ vx, vy, vz });
+                try verts.append(self.alloc, .{ vx, vy, vz, 1 });
             } else if (std.mem.eql(u8, line_type, "f")) {
                 var face_iter = std.mem.splitScalar(u8, x, '/');
                 const fx = face_iter.next() orelse continue;
